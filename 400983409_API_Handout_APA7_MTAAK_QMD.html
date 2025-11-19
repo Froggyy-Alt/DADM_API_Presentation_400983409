@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mohammed Tariq Azeez A K">
+<meta name="keywords" content="R, APIs, data import, httr2, jsonlite, tidyverse">
+<meta name="description" content="APIS AND DATA IMPORT IN R">
+
+<title>Importing Data in R Directly From the Internet Using APIs: Exploring Various Packages</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/clipboard/clipboard.min.js"></script>
+<script src="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/quarto-html/popper.min.js"></script>
+<script src="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="400983409_API_Handout_APA7_MTAAK_QMD_files/libs/bootstrap/bootstrap-accd75c2bd871f03c4c02dcc9260e8c4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+<link rel="stylesheet" href="_extensions/wjschne/apaquarto/apa.css">
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#web-apis-and-response-formats" id="toc-web-apis-and-response-formats" class="nav-link" data-scroll-target="#web-apis-and-response-formats"><span class="header-section-number">2</span> Web APIs and Response Formats</a>
+  <ul class="collapse">
+  <li><a href="#what-is-a-web-api" id="toc-what-is-a-web-api" class="nav-link" data-scroll-target="#what-is-a-web-api"><span class="header-section-number">2.1</span> What is a web API?</a></li>
+  <li><a href="#json-as-the-dominant-format" id="toc-json-as-the-dominant-format" class="nav-link" data-scroll-target="#json-as-the-dominant-format"><span class="header-section-number">2.2</span> JSON as the dominant format</a></li>
+  </ul></li>
+  <li><a href="#r-packages-and-basic-workflow" id="toc-r-packages-and-basic-workflow" class="nav-link" data-scroll-target="#r-packages-and-basic-workflow"><span class="header-section-number">3</span> R Packages and Basic Workflow</a>
+  <ul class="collapse">
+  <li><a href="#core-packages" id="toc-core-packages" class="nav-link" data-scroll-target="#core-packages"><span class="header-section-number">3.1</span> Core packages</a></li>
+  <li><a href="#a-generic-api-workflow-in-r" id="toc-a-generic-api-workflow-in-r" class="nav-link" data-scroll-target="#a-generic-api-workflow-in-r"><span class="header-section-number">3.2</span> A generic API workflow in R</a></li>
+  </ul></li>
+  <li><a href="#worked-example-github-repository-metadata" id="toc-worked-example-github-repository-metadata" class="nav-link" data-scroll-target="#worked-example-github-repository-metadata"><span class="header-section-number">4</span> Worked Example: GitHub Repository Metadata</a>
+  <ul class="collapse">
+  <li><a href="#goal-of-the-example" id="toc-goal-of-the-example" class="nav-link" data-scroll-target="#goal-of-the-example"><span class="header-section-number">4.1</span> Goal of the example</a>
+  <ul class="collapse">
+  <li><a href="#step-1-inspect-the-endpoint" id="toc-step-1-inspect-the-endpoint" class="nav-link" data-scroll-target="#step-1-inspect-the-endpoint"><span class="header-section-number">4.1.1</span> Step 1 – Inspect the endpoint</a></li>
+  <li><a href="#step-2-request-and-parse-in-r" id="toc-step-2-request-and-parse-in-r" class="nav-link" data-scroll-target="#step-2-request-and-parse-in-r"><span class="header-section-number">4.1.2</span> Step 2 – Request and parse in R</a></li>
+  <li><a href="#step-3-light-transformation" id="toc-step-3-light-transformation" class="nav-link" data-scroll-target="#step-3-light-transformation"><span class="header-section-number">4.1.3</span> Step 3 – Light transformation</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#challenges-and-best-practices" id="toc-challenges-and-best-practices" class="nav-link" data-scroll-target="#challenges-and-best-practices"><span class="header-section-number">5</span> Challenges and Best Practices</a>
+  <ul class="collapse">
+  <li><a href="#authentication-and-rate-limits" id="toc-authentication-and-rate-limits" class="nav-link" data-scroll-target="#authentication-and-rate-limits"><span class="header-section-number">5.1</span> Authentication and rate limits</a></li>
+  <li><a href="#nested-and-evolving-json-structures" id="toc-nested-and-evolving-json-structures" class="nav-link" data-scroll-target="#nested-and-evolving-json-structures"><span class="header-section-number">5.2</span> Nested and evolving JSON structures</a></li>
+  <li><a href="#error-handling-and-reproducibility" id="toc-error-handling-and-reproducibility" class="nav-link" data-scroll-target="#error-handling-and-reproducibility"><span class="header-section-number">5.3</span> Error handling and reproducibility</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">6</span> Conclusion</a></li>
+  <li><a href="#affidavit" id="toc-affidavit" class="nav-link" data-scroll-target="#affidavit"><span class="header-section-number">7</span> Affidavit</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="400983409_API_Handout_APA7_MTAAK_QMD.pdf"><i class="bi bi-file-pdf"></i>PDF (apaquarto)</a></li><li><a href="400983409_API_Handout_APA7_MTAAK_QMD.docx"><i class="bi bi-file-word"></i>MS Word (apaquarto)</a></li></ul></div></nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content" id="quarto-document-content">
+
+
+
+
+<br>
+
+<br>
+
+<section id="title" class="level1 title unnumbered unlisted">
+<h1 class="title unnumbered unlisted">Importing Data in R Directly From the Internet Using APIs: Exploring Various Packages</h1>
+<div class="Author">
+<br>
+
+<p>Mohammed Tariq Azeez A K</p>
+<p>MBA Business Analytics - Matriculation No.&nbsp;400983409, Hochschule Fresenius University of Applied Sciences</p>
+</div>
+<br>
+
+<br>
+
+</section>
+<section id="author-note" class="level1 unnumbered unlisted AuthorNote">
+<h1 class="unnumbered unlisted AuthorNote">Author Note</h1>
+<p>Correspondence concerning this article should be addressed to Mohammed Tariq Azeez A K, MBA Business Analytics - Matriculation No.&nbsp;400983409, Hochschule Fresenius University of Applied Sciences, Cologne, Germany, Email: <a href="mailto:tariq.azeez.2024@gmail.com">tariq.azeez.2024@gmail.com</a></p>
+<br>
+</section>
+<section id="abstract" class="level1 unnumbered unlisted AuthorNote">
+<h1 class="unnumbered unlisted AuthorNote">Abstract</h1>
+<p><em>Keywords</em>: R, APIs, data import, httr2, jsonlite, tidyverse</p>
+<br>
+</section>
+<section id="firstheader" class="level1 title unnumbered unlisted">
+<h1 class="title unnumbered unlisted">Importing Data in R Directly From the Internet Using APIs: Exploring Various Packages</h1>
+</section>
+<section id="introduction" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>Modern business analytics rarely relies only on static CSV or Excel files that are downloaded once and then analysed in isolation. Instead, many real-world projects require <strong>up-to-date information</strong> from online platforms, financial services, or open data portals. Web APIs (Application Programming Interfaces) are the standard way to access these data sources programmatically.</p>
+<p>In the course <em>Data Analysis for Decision-Making (WS 2025/26)</em>, this topic focuses on how to use R to import data directly from the internet via web APIs. The goal of this handout is to provide a compact but complete overview that supports the presentation:</p>
+<ul>
+<li>What web APIs are and why they matter.</li>
+<li>How JSON responses can be turned into usable R objects.</li>
+<li>Which R packages are most useful for API workflows.</li>
+<li>A small, realistic example using the GitHub API.</li>
+<li>Challenges and best practices when working with APIs.</li>
+<li>A short template for an exercise you can adapt to other APIs.</li>
+</ul>
+</section>
+<section id="web-apis-and-response-formats" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Web APIs and Response Formats</h1>
+<section id="what-is-a-web-api" class="level2" data-number="2.1">
+<h2 data-number="2.1" data-anchor-id="what-is-a-web-api"><span class="header-section-number">2.1</span> What is a web API?</h2>
+<p>A <strong>web API</strong> is an interface that allows one piece of software (for example, an R script) to request data from another system over the internet. Most modern APIs are <strong>HTTP-based</strong> and use standard methods such as:</p>
+<ul>
+<li><code>GET</code> – retrieve data (read-only),</li>
+<li><code>POST</code> – send or create data,</li>
+<li><code>PUT</code> / <code>PATCH</code> / <code>DELETE</code> – update or delete data</li>
+</ul>
+<p>APIs expose <strong>endpoints</strong>, which are specific URLs that provide a certain kind of information. Examples include:</p>
+<ul>
+<li><code>https://api.github.com/repos/{owner}/{repo}</code>,</li>
+<li><code>https://api.exchangerate.host/latest</code>,</li>
+<li><code>https://api.coindesk.com/v1/bpi/currentprice.json</code>.</li>
+</ul>
+<p>Each endpoint has documented parameters (for example, which currency to use or how many results to return) and a clear specification of what the response will look like.</p>
+</section>
+<section id="json-as-the-dominant-format" class="level2" data-number="2.2">
+<h2 data-number="2.2" data-anchor-id="json-as-the-dominant-format"><span class="header-section-number">2.2</span> JSON as the dominant format</h2>
+<p>Most modern APIs respond with data in <strong>JSON (JavaScript Object Notation)</strong>. Conceptually, JSON is a nested structure of:</p>
+<ul>
+<li>objects (key–value pairs),</li>
+<li>arrays (ordered lists),</li>
+<li>primitive values (numbers, strings, logicals, or null).</li>
+</ul>
+<p>From R’s perspective, JSON is naturally represented as nested lists. A simplified example response might look like:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"time"</span><span class="fu">:</span> <span class="st">"2025-11-19T07:00:00Z"</span><span class="fu">,</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"value"</span><span class="fu">:</span> <span class="fl">123.45</span><span class="fu">,</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"meta"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"source"</span><span class="fu">:</span> <span class="st">"example-api"</span><span class="fu">,</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"units"</span><span class="fu">:</span> <span class="st">"index points"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>In an R workflow, we typically:</p>
+<ol type="1">
+<li>Send a request and receive the raw HTTP response.</li>
+<li>Extract the body as text or as JSON.</li>
+<li>Parse the JSON into R objects using <strong>jsonlite</strong>.</li>
+<li>Convert the nested lists into a tidy tibble or data frame.</li>
+</ol>
+<p>Other formats such as XML or CSV still appear in some APIs, but JSON has become the default in many modern services.</p>
+</section>
+</section>
+<section id="r-packages-and-basic-workflow" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> R Packages and Basic Workflow</h1>
+<section id="core-packages" class="level2" data-number="3.1">
+<h2 data-number="3.1" data-anchor-id="core-packages"><span class="header-section-number">3.1</span> Core packages</h2>
+<p>For this topic, a small set of R packages covers most needs:</p>
+<ul>
+<li><strong>httr2</strong> – a modern HTTP client for building, sending, and inspecting requests and responses.</li>
+<li><strong>jsonlite</strong> – a robust JSON parser that converts JSON into lists or data frames.</li>
+<li><strong>dplyr</strong>, <strong>tidyr</strong>, <strong>purrr</strong> – tidyverse tools for wrangling and transforming nested data structures.</li>
+<li><strong>ggplot2</strong> – for visualising the results of the analysis.</li>
+</ul>
+<p>These packages can be combined into a simple but powerful workflow.</p>
+</section>
+<section id="a-generic-api-workflow-in-r" class="level2" data-number="3.2">
+<h2 data-number="3.2" data-anchor-id="a-generic-api-workflow-in-r"><span class="header-section-number">3.2</span> A generic API workflow in R</h2>
+<p>The basic pattern for working with an HTTP API in R looks like this:</p>
+<p>The code itself is usually short. The main intellectual work lies in understanding the <strong>structure</strong> of the JSON and designing a tidy representation that is suitable for analysis.</p>
+</section>
+</section>
+<section id="worked-example-github-repository-metadata" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Worked Example: GitHub Repository Metadata</h1>
+<p>To connect the presentation and this handout, we use the same simple example: querying the GitHub REST API for information about a public repository. GitHub exposes rich metadata about repositories, commits, issues, and more.</p>
+<section id="goal-of-the-example" class="level2" data-number="4.1">
+<h2 data-number="4.1" data-anchor-id="goal-of-the-example"><span class="header-section-number">4.1</span> Goal of the example</h2>
+<blockquote class="blockquote">
+<p>Retrieve basic metadata about the <code>tidyverse/ggplot2</code> repository and summarise it in a small tibble that can be used in further analysis.</p>
+</blockquote>
+<section id="step-1-inspect-the-endpoint" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" data-anchor-id="step-1-inspect-the-endpoint"><span class="header-section-number">4.1.1</span> Step 1 – Inspect the endpoint</h3>
+<p>The GitHub API documentation tells us that repository metadata is available at:</p>
+<pre class="text"><code>https://api.github.com/repos/{owner}/{repo}</code></pre>
+<p>For the repository <code>tidyverse/ggplot2</code>, the URL becomes:</p>
+<pre class="text"><code>https://api.github.com/repos/tidyverse/ggplot2</code></pre>
+</section>
+<section id="step-2-request-and-parse-in-r" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" data-anchor-id="step-2-request-and-parse-in-r"><span class="header-section-number">4.1.2</span> Step 2 – Request and parse in R</h3>
+</section>
+<section id="step-3-light-transformation" class="level3" data-number="4.1.3">
+<h3 data-number="4.1.3" data-anchor-id="step-3-light-transformation"><span class="header-section-number">4.1.3</span> Step 3 – Light transformation</h3>
+<p>The tibble can be enriched with a derived variable and then simplified:</p>
+<p>Even though this is a small example, it demonstrates the complete chain from endpoint to tidy tibble, which is the core skill required for more complex APIs.</p>
+</section>
+</section>
+</section>
+<section id="challenges-and-best-practices" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Challenges and Best Practices</h1>
+<p>Working with APIs is powerful but also comes with recurring challenges. The most important ones for students in this course are summarised below.</p>
+<section id="authentication-and-rate-limits" class="level2" data-number="5.1">
+<h2 data-number="5.1" data-anchor-id="authentication-and-rate-limits"><span class="header-section-number">5.1</span> Authentication and rate limits</h2>
+<p>Many APIs require <strong>API keys</strong> or OAuth tokens. Even public APIs often impose <strong>rate limits</strong>, which restrict how many requests can be made per minute or hour. Best practice is to:</p>
+<ul>
+<li>read the documentation carefully,</li>
+<li>store keys in environment variables (for example, via <code>.Renviron</code>),</li>
+<li>avoid hard-coding secrets in scripts or sharing them on GitHub.</li>
+</ul>
+</section>
+<section id="nested-and-evolving-json-structures" class="level2" data-number="5.2">
+<h2 data-number="5.2" data-anchor-id="nested-and-evolving-json-structures"><span class="header-section-number">5.2</span> Nested and evolving JSON structures</h2>
+<p>Deeply nested JSON can be hard to convert into a tidy format. It is helpful to:</p>
+<ul>
+<li>start by inspecting the raw structure with <code>str()</code> or <code>glimpse()</code>,</li>
+<li>use <code>purrr::map_*()</code> and <code>tidyr::unnest_*()</code> when lists of lists appear,</li>
+<li>keep wrangling code modular and well commented.</li>
+</ul>
+<p>APIs sometimes change their structure over time, so code should be written in a way that makes such assumptions explicit and easy to update.</p>
+</section>
+<section id="error-handling-and-reproducibility" class="level2" data-number="5.3">
+<h2 data-number="5.3" data-anchor-id="error-handling-and-reproducibility"><span class="header-section-number">5.3</span> Error handling and reproducibility</h2>
+<p>Requests can fail due to network problems, invalid parameters, or server-side issues. The <code>httr2</code> package provides helpers such as <code>resp_status()</code> and <code>resp_status_desc()</code> to inspect responses and react accordingly.</p>
+<p>For reproducibility, it is good practice to:</p>
+<ul>
+<li>log which endpoints and parameters were used,</li>
+<li>cache important responses (for example, as <code>.rds</code> files),</li>
+<li>document the date on which the data were retrieved.</li>
+</ul>
+</section>
+</section>
+<section id="conclusion" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Conclusion</h1>
+<p>Importing data in R directly from the internet using APIs is a key skill for data-driven decision-making. Once the basic ideas of HTTP requests and JSON parsing are understood, the combination of <strong>httr2</strong>, <strong>jsonlite</strong>, and the tidyverse allows analysts to build workflows that are:</p>
+<ul>
+<li>automated rather than manual,</li>
+<li>transparent and reproducible,</li>
+<li>flexible enough to incorporate different APIs and domains.</li>
+</ul>
+<p>The small GitHub example in this handout is only a starting point. The same principles extend to more advanced use cases such as authenticated endpoints, scheduled data collection, interactive dashboards, or integration with Shiny applications.</p>
+</section>
+<section id="affidavit" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Affidavit</h1>
+<p>I hereby affirm that this submitted paper was authored unaided and solely by me. Additionally, no other sources than those in the reference list were used. Parts of this paper, including tables and figures, that have been taken either verbatim or analogously from other works have in each case been properly cited with regard to their origin and authorship. This paper either in parts or in its entirety, be it in the same or similar form, has not been submitted to any other examination board and has not been published.</p>
+<p>I acknowledge that the university may use plagiarism detection software to check my work. I agree to cooperate with any investigation of suspected plagiarism and to provide any additional information or evidence requested by the university.</p>
+<p><strong>Name:</strong> Mohammed Tariq Azeez A K<br>
+<strong>Place:</strong> Cologne _____________________<br>
+<strong>Date:</strong> 19 November 2025 _____________</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
